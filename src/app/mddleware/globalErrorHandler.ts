@@ -3,6 +3,12 @@ import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 
 import config from "../config";
+import handleZodError from "../error/handleZodError";
+import handleValidationError from "../error/handleValidationError";
+import handleCastError from "../error/handleCastError";
+import handleDuplicateError from "../error/handleDuplicateError";
+import AppError from "../error/AppError";
+import { TErrorSources } from "../interface/error";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -53,7 +59,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     ];
   }
   // ultimate return
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success: false,
     message,
     errorSource,

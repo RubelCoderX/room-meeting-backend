@@ -2,36 +2,40 @@ import { Schema, model } from "mongoose";
 import { TUser, UserModel } from "./user.interface";
 import bcrypt from "bcrypt";
 
-const userSchema = new Schema<TUser, UserModel>({
-  name: {
-    type: String,
-    required: true,
+const userSchema = new Schema<TUser, UserModel>(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [
+        /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+        "Please fill a valid email address",
+      ],
+    },
+    password: {
+      type: String,
+      required: true,
+      select: 0,
+    },
+    profileImg: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
+    },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    match: [
-      /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-      "Please fill a valid email address",
-    ],
-  },
-  password: {
-    type: String,
-    required: true,
-    select: 0,
-  },
-  profileImg: {
-    type: String,
-    default: "",
-  },
-  address: {
-    type: String,
-
-    default: "",
-  },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // password hashing
 userSchema.pre("save", async function (next) {
@@ -44,11 +48,11 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// set '' after saving password
-userSchema.post("save", function (doc, next) {
-  doc.password = "";
-  next();
-});
+// // set '' after saving password
+// userSchema.post("save", function (doc, next) {
+//   doc.password = "";
+//   next();
+// });
 
 // Static method to check if a user exists by
 userSchema.statics.isUserExitsByEmail = async function (email: string) {
